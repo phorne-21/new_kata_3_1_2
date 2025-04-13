@@ -1,0 +1,94 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Admin panel</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<style> body {
+    background-color: #20B2AA;
+} </style>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Logout"/>
+</form>
+<h1 style="text-align: center;">Admin panel</h1>
+<h2 style="text-align: center;">Add new user</h2>
+<form method="post">
+    <h3 style="text-align: center;">
+        <style> input {
+            background-color: #9ACD32;
+        } </style>
+        <label for="username">First name</label>
+        <input name="username" type="text" id="username" required/>
+        <br>
+
+        <label for="lastname">Last name</label>
+        <input name="lastname" type="text" id="lastname" required/>
+        <br>
+
+        <label for="email">Email</label>
+        <input name="email" type="text" id="email" required/>
+        <br>
+
+        <label for="age">Age</label>
+        <input name="age" type="number" id="age" required/>
+        <br>
+
+        <label for="password">Password</label>
+        <input name="password" type="text" id="password" required/>
+        <br>
+
+        <label for="roles">Roles</label>
+        <select name="roles" id="roles" multiple style="width: 200px; padding: 5px;">
+            <option th:each="role : ${allRoles}"
+                    th:value="${role.name}"
+                    th:text="${role.name.substring(5)}"></option>
+        </select>
+        <br>
+        <input type="submit" value="Add new user" style="margin-top: 10px;"/>
+    </h3>
+</form>
+<br/><br/>
+<div>
+    <table border="1" bgcolor=66CCAA>
+        <tr>
+            <th>ID</th>
+            <th>FIRST NAME</th>
+            <th>LAST NAME</th>
+            <th>EMAIL</th>
+            <th>AGE</th>
+            <th>ROLES</th>
+            <th>READ USER</th>
+            <th>UPDATE</th>
+            <th>DELETE</th>
+        </tr>
+        <tr th:each="user : ${userList}">
+            <td th:utext="${user.id}">ID</td>
+            <td th:utext="${user.username}">FIRST NAME</td>
+            <td th:utext="${user.lastname}">LAST NAME</td>
+            <td th:utext="${user.email}">EMAIL</td>
+            <td th:utext="${user.age}">AGE</td>
+            <td>
+    <span th:each="role, stat : ${user.roles}"
+          th:text="${role.name.substring(5)} + (${not stat.last} ? ', ' : '')"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/user/{id}(id=${user.id})}">User Page</a>
+            </td>
+            <td>
+                <form action="/admin/update" method="get">
+                    <input type="hidden" name="id" th:value="${user.id}">
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+            <td>
+                <form action="/admin/delete" method="post">
+                    <input type="hidden" name="id" th:value="${user.id}">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

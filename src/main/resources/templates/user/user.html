@@ -1,0 +1,42 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>User</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<style> body {
+    background-color: #FFE4B5;
+} </style>
+<h2 style="text-align: center;">User information-page</h2>
+<form method="get">
+    <h4 style="text-align: center;">
+        User's id:
+        <span th:utext="${user.id}"></span>
+        <br>
+        User's first name:
+        <span th:utext="${user.username}"></span>
+        <br>
+        <br>
+        User's last name:
+        <span th:utext="${user.lastname}"></span>
+        <br>
+        User's email:
+        <span th:utext="${user.email}"></span>
+        <br>
+        User's age:
+        <span th:utext="${user.age}"></span>
+        <p><strong>Roles:</strong>
+            <span th:if="${user?.roles}"
+                  th:each="role : ${user.roles}"
+                  th:text="${role.name.substring(5)} + ' '"></span>
+            <span th:unless="${user?.roles}">N/A</span>
+        </p>
+    </h4>
+</form>
+<!--todo logout-->
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Logout"/>
+</form>
+</body>
+</html>
