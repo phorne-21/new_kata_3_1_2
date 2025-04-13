@@ -3,12 +3,16 @@ package ru.kata.spring.boot_security.demo.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/admin")
@@ -31,14 +35,6 @@ public class AdminController {
         logger.info("getUsers method called in AdminController");
         return "admin/users";
     }
-
-//    @PostMapping
-//    public String addUser(@ModelAttribute("user") User user,
-//                          Model model) {
-//        userService.save(user);
-//        logger.info("addUser method called in AdminController \n new user created");
-//        return "redirect:/admin";
-//    }
 
     @PostMapping
     public String addUser(@RequestParam String username,
@@ -65,15 +61,29 @@ public class AdminController {
             return "redirect:/admin";
         }
         model.addAttribute("user", user);
+        model.addAttribute("allRoles", roleService.getAllRoles());
         logger.info("showUserUpdatePage method called in AdminController \n id " + id + " found, if's ok.");
         return "admin/update";
     }
 
     @PostMapping("/update")
     public String updateUser(@RequestParam("id") Long id,
-                             @ModelAttribute("user") User user) {
+                             @RequestParam(value = "username", required = false) String username,
+                             @RequestParam(value = "lastname", required = false) String lastname,
+                             @RequestParam(value = "email", required = false) String email,
+                             @RequestParam(value = "age", required = false) Integer age,
+                             @RequestParam(value = "password", required = false) String password,
+                             @RequestParam(value = "roles", required = false) List<String> roleNames) {
+
+        User user = new User(username, lastname, age, email);
+        user.setPassword(password);
+        if (roleNames != null) {
+            Set<Role> roles = roleNames.stream().map(roleService::findRoleByName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
         userService.update(id, user);
-        logger.info("updateUser method called in AdminController \n user updated");
         return "redirect:/admin";
     }
 
