@@ -26,27 +26,17 @@ public class DefaultUsersInitializer {
             if (userService.findAll().isEmpty()) {
                 Role roleAdmin = new Role("ROLE_ADMIN");
                 Role roleUser = new Role("ROLE_USER");
-                
+
                 roleService.saveRole(roleAdmin);
                 roleService.saveRole(roleUser);
 
-                User admin = new User();
-                admin.setUsername("admin");
-                admin.setLastname("admin");
-                admin.setEmail("admin@admin.com");
-                admin.setAge(30);
-                // todo encode -?
+                User admin = new User("admin", "admin", 20, "admin@admin.com");
                 admin.setPassword("admin");
                 Set<Role> adminRoles = new HashSet<>();
                 adminRoles.add(roleAdmin);
                 admin.setRoles(adminRoles);
 
-                User user = new User();
-                user.setUsername("user");
-                user.setLastname("user");
-                user.setEmail("user@user.com");
-                user.setAge(25);
-                // todo encode -?
+                User user = new User("test_user", "test_user", 30, "test@test.com");
                 user.setPassword("user");
                 Set<Role> userRoles = new HashSet<>();
                 userRoles.add(roleUser);
