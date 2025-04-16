@@ -15,7 +15,10 @@ public class Role implements GrantedAuthority {
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
-    String name;
+    private String name;
+
+    @Transient
+    public static final String defaultRoleName = "ROLE_USER";
 
     public Role() {
     }
@@ -42,6 +45,9 @@ public class Role implements GrantedAuthority {
     }
 
     public void setName(String name) {
+        if (!name.startsWith("ROLE_")) {
+            throw new IllegalArgumentException("Role name must start with 'ROLE_'");
+        }
         this.name = name;
     }
 
@@ -49,12 +55,12 @@ public class Role implements GrantedAuthority {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Role role1 = (Role) o;
-        return Objects.equals(id, role1.id) && Objects.equals(name, role1.name);
+        return Objects.equals(id, role1.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id);
     }
 
     @Override
@@ -62,4 +68,3 @@ public class Role implements GrantedAuthority {
         return name.startsWith("ROLE_") ? name.substring(5) : name;
     }
 }
-
