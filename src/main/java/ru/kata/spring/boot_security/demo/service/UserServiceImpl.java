@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,11 +12,9 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -34,34 +33,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void save(User user) {
-        logger.info("save was called in UserServiceImpl");
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            Set<Role> defaultRole = new HashSet<>();
-            defaultRole.add(roleService.findRoleByName("ROLE_USER"));
-            user.setRoles(defaultRole);
-        }
-        userRepository.save(user);
-        logger.info("user saved in UserServiceImpl");
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public User findById(Long id) {
-        logger.info("findById was called in UserServiceImpl");
-        return userRepository.findById(id).orElse(null);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<User> findAll() {
         logger.info("findAll was called in UserServiceImpl");
         return userRepository.findAll();
     }
 
-    // look at...
-    public void update(Long id, User user) {
+    @Override
+    public void saveUserWithRoles(User user, String password, List<String> roleNames) {
+        logger.info("saveUserWithRoles was called in UserServiceImpl");
+        logger.info("Roles: " + (roleNames != null ? roleNames : "null"));
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRoles(getRolesSetByUserName(roleNames));
+        userRepository.save(user);
+        logger.info("User saved in UserServiceImpl");
+        logger.info(user.toString() + " " + user.getRoles().toString());
+    }
+
+    public void save(User user) {
+        logger.info("save was called in UserServiceImpl");
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            Set<Role> userRoles = new HashSet<>();
+            userRoles.add(roleService.findRoleByName(Role.defaultRoleName));
+            user.setRoles(userRoles);
+        }
+        userRepository.save(user);
+        logger.info("User saved in UserServiceImpl");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User findById(Long id) {
+        logger.info("findById was called in UserServiceImpl");
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User not found, id = " + id));
+    }
+
+    @Override
+    public void update(Long id, User user, String password, List<String> roleNames) {
         logger.info("update was called in UserServiceImpl");
         User u = userRepository.findById(id).orElseThrow();
         if (user.getUsername() != null) {
@@ -76,11 +88,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user.getEmail() != null) {
             u.setEmail(user.getEmail());
         }
-        if (user.getPassword() != null || !user.getPassword().isEmpty()) {
-            u.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (password != null) {
+            u.setPassword(passwordEncoder.encode(password));
         }
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            u.setRoles(user.getRoles());
+        if (roleNames != null) {
+            u.setRoles(getRolesSetByUserName(roleNames));
         }
         userRepository.save(u);
         logger.info("user updated in UserServiceImpl");
@@ -88,6 +100,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void delete(Long id) {
+        logger.info("delete was called in UserServiceImpl");
         userRepository.deleteById(id);
         logger.info("user deleted in UserServiceImpl");
     }
@@ -95,32 +108,50 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        logger.info("loadUserByUsername was called in UserServiceImpl");
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                user.getAuthorities());
+        return user;
+    }
+
+    @Transactional(readOnly = true)
+    public User findByUsername(String username) {
+        logger.info("findByUsername was called in UserServiceImpl");
+        return userRepository.findByUsername(username);
     }
 
     @Override
-    public void saveUserWithRoles(User user, List<String> roleNames) {
-        Set<Role> userRoles = new HashSet<>();
-        for (String roleName : roleNames) {
-            Optional<Role> role = Optional.ofNullable(roleService.findRoleByName(roleName));
-            if (role.isPresent()) {
-                userRoles.add(role.get());
-            } else {
-                logger.warning("Role not found: " + roleName);
-            }
-        }
-        user.setRoles(userRoles);
-        userRepository.save(user);
+    @Transactional(readOnly = true)
+    public List<Role> getAllRoles() {
+        return roleService.getAllRoles();
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> makeAllUserModelAttributes(Long userId) {
+        logger.info("makeAllUserModelAttributes was called in UserServiceImpl");
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User not found, id = " + userId));
+        Map<String, Object> model = new HashMap<>();
+        model.put("user", user);
+        model.put("allRoles", roleService.getAllRoles());
+        return model;
+    }
+
+    private Set<Role> getRolesSetByUserName(List<String> roleNames) {
+        logger.info("getRolesSetByUserName was called in UserServiceImpl");
+        Set<Role> userRoles = new HashSet<>();
+        if (roleNames != null && !roleNames.isEmpty()) {
+            userRoles = roleNames.stream().map(roleService::findRoleByName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+        } else {
+            userRoles.add(roleService.findRoleByName(Role.defaultRoleName));
+        }
+        return userRoles;
     }
 }

@@ -5,7 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @Transactional
@@ -36,5 +39,30 @@ public class RoleServiceImpl implements RoleService {
     public Role findRoleByName(String roleName) {
         logger.info("findRoleByName was called in RoleServiceImpl");
         return roleRepository.findByName(roleName);
+    }
+
+    public Set<Role> getDefaultRolesSet() {
+        Set<Role> roles = new HashSet<>();
+        roles.add(this.findRoleByName(Role.defaultRoleName));
+        return roles;
+    }
+
+    @Override
+    public Set<Role> getRolesSetByUserName(Set<Role> userRoles, List<String> roleNames) {
+        Set<Role> roles;
+        if (userRoles == null || userRoles.isEmpty()) {
+            roles = getDefaultRolesSet();
+        } else {
+            roles = new HashSet<>();
+            for (String roleName : roleNames) {
+                Optional<Role> role = Optional.ofNullable(this.findRoleByName(roleName));
+                if (role.isPresent()) {
+                    roles.add(role.get());
+                } else {
+                    logger.warning("Role not found: " + roleName);
+                }
+            }
+        }
+        return roles;
     }
 }

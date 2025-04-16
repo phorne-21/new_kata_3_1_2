@@ -39,7 +39,7 @@
         <br>
 
         <label for="roles">Roles</label>
-        <select name="roles" id="roles" multiple style="width: 200px; padding: 5px;">
+        <select name="roleNames" id="roles" multiple style="width: 200px; padding: 5px;">
             <option th:each="role : ${allRoles}"
                     th:value="${role.name}"
                     th:text="${role.name.substring(5)}"></option>
