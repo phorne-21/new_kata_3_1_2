@@ -1,19 +1,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Update user</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
 </head>
 <body>
-<style> body {
-    background-color: #FFE4B5;
-} </style>
 <h2>Update User</h2>
 <form th:action="@{/admin/update}" method="post">
     <h4>
-        <style> input {
-            background-color: #9ACD32;
-        } </style>
         <input type="hidden" name="id" th:value="${user.id}"/>
         <div>
             <label for="username">First name</label>
