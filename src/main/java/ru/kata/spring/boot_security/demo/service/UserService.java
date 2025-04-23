@@ -23,4 +23,6 @@ public interface UserService {
     List<Role> getAllRoles();
 
     Map<String, Object> makeAllUserModelAttributes(Long userId);
+
+    User findByEmail(String email);
 }

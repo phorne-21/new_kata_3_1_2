@@ -24,7 +24,7 @@ public class UserController {
     public String showUserInfo(Model model,
                                Authentication authentication) {
         model.addAttribute("user",
-                userService.findByUsername(authentication.getName()));
+                userService.findUserByEmail(authentication.getName()));
         return "user/user";
     }
 }
