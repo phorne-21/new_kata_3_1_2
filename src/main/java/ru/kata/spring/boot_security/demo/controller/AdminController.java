@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,14 +34,14 @@ public class AdminController {
     }
 
     @PostMapping
-    public String addUser(@RequestParam String username,
+    public String addUser(@RequestParam String firstName,
                           @RequestParam String lastname,
                           @RequestParam String email,
                           @RequestParam int age,
                           @RequestParam String password,
                           @RequestParam(required = false) List<String> roleNames) {
         userService.saveUserWithRoles(
-                new User(username, lastname, age, email),
+                new User(firstName, lastname, age, email),
                 password,
                 roleNames);
         logger.info("addUser method  from AdminController");
@@ -59,7 +58,7 @@ public class AdminController {
 
     @PostMapping("/update")
     public String updateUser(@RequestParam("id") Long id,
-                             @RequestParam String username,
+                             @RequestParam String firstName,
                              @RequestParam String lastname,
                              @RequestParam String email,
                              @RequestParam int age,
@@ -67,28 +66,12 @@ public class AdminController {
                              @RequestParam(required = false) List<String> roles) {
         userService.update(
                 id,
-                new User(username, lastname, age, email),
+                new User(firstName, lastname, age, email),
                 password,
                 roles);
         logger.info("updateUser from AdminController");
         return "redirect:/admin";
     }
-//    @PostMapping("/update")
-//    public String updateUser(@RequestParam("id") Long id,
-//                             @RequestParam(value = "username", required = false) String username,
-//                             @RequestParam(value = "lastname", required = false) String lastname,
-//                             @RequestParam(value = "email", required = false) String email,
-//                             @RequestParam(value = "age", required = false) Integer age,
-//                             @RequestParam(value = "password", required = false) String password,
-//                             @RequestParam(value = "roles", required = false) List<String> roleNames) {
-//        userService.update(
-//                id,
-//                new User(username, lastname, age, email),
-//                password,
-//                roleNames);
-//        logger.info("updateUser from AdminController");
-//        return "redirect:/admin";
-//    }
 
     @PostMapping("/delete")
     public String deleteUser(@RequestParam Long id) {

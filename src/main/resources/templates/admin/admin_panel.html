@@ -92,7 +92,7 @@
                                         <tbody>
                                         <tr th:each="user : ${userList}">
                                             <td th:text="${user.id}">ID</td>
-                                            <td th:text="${user.username}">First Name</td>
+                                            <td th:text="${user.firstName}">First Name</td>
                                             <td th:text="${user.lastname}">Last Name</td>
                                             <td th:text="${user.age}">Age</td>
                                             <td th:text="${user.email}">Email</td>
@@ -121,11 +121,11 @@
                             <!-- Add User Form -->
                             <div class="tab-pane fade" id="new-user">
                                 <h4 class="mb-3">Add new user</h4>
-                                <div class="form-center">
+                                <div class="form-center text-center">
                                     <form th:action="@{/admin}" method="post">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">First name</label>
-                                            <input name="username" type="text" required class="form-control"/>
+                                            <input name="firstName" type="text" required class="form-control"/>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Last name</label>
@@ -183,7 +183,7 @@
                                 <tbody>
                                 <tr>
                                     <td th:text="${user.id}"></td>
-                                    <td th:text="${user.username}"></td>
+                                    <td th:text="${user.firstName}"></td>
                                     <td th:text="${user.lastname}"></td>
                                     <td th:text="${user.age}"></td>
                                     <td th:text="${user.email}"></td>
@@ -221,7 +221,7 @@
                         </div>
                         <div class="mb-2 mx-auto" style="width: 80%;">
                             <label class="form-label fw-bold d-inline">First Name</label>
-                            <input type="text" class="form-control mx-auto text-center" name="username" th:value="${user.username}" style="width: 60%;" required>
+                            <input type="text" class="form-control mx-auto text-center" name="firstName" th:value="${user.firstName}" style="width: 60%;" required>
                         </div>
                         <div class="mb-2 mx-auto" style="width: 80%;">
                             <label class="form-label fw-bold d-inline">Last Name</label>
@@ -289,7 +289,7 @@
                                 name</label>
                             <input class="form-control mx-auto text-center"
                                    type="text"
-                                   th:value="${user.username}"
+                                   th:value="${user.firstName}"
                                    disabled
                                    style="width: 60%;">
                         </div>
