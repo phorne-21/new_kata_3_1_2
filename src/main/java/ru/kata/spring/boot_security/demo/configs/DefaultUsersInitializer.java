@@ -2,20 +2,21 @@ package ru.kata.spring.boot_security.demo.configs;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
+import ru.kata.spring.boot_security.demo.DTO.UserCreateDTO;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.DTO.UserDTOService;
 import ru.kata.spring.boot_security.demo.service.RoleService;
-import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Component
 public class DefaultUsersInitializer {
-    private final UserService userService;
+    private final UserDTOService userService;
     private final RoleService roleService;
 
-    public DefaultUsersInitializer(UserService userService, RoleService roleService) {
+    public DefaultUsersInitializer(UserDTOService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
     }
@@ -42,8 +43,8 @@ public class DefaultUsersInitializer {
                 userRoles.add(roleUser);
                 user.setRoles(userRoles);
 
-                userService.save(admin);
-                userService.save(user);
+                userService.create(admin);
+                userService.create(UserCreateDTO(user));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -22,7 +22,7 @@ public class User implements UserDetails {
     private String firstName;
 
     @Column(name = "lastname")
-    private String lastname;
+    private String lastName;
 
     @Column(name = "age")
     private Integer age;
@@ -43,9 +43,9 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String firstName, String lastname, Integer age, String email) {
+    public User(String firstName, String lastName, Integer age, String email) {
         this.firstName = firstName;
-        this.lastname = lastname;
+        this.lastName = lastName;
         this.age = age;
         this.email = email;
     }
@@ -58,12 +58,12 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     @Override
@@ -141,11 +141,11 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastname, user.lastname) && Objects.equals(age, user.age) && Objects.equals(email, user.email) && Objects.equals(password, user.password);
+        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(age, user.age) && Objects.equals(email, user.email) && Objects.equals(password, user.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastname, age, email, password);
+        return Objects.hash(id, firstName, lastName, age, email, password);
     }
 }
