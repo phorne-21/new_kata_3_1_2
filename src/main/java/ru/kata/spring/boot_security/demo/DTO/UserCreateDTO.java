@@ -2,8 +2,11 @@ package ru.kata.spring.boot_security.demo.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import ru.kata.spring.boot_security.demo.model.Role;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class UserCreateDTO {
     @NotBlank
@@ -21,6 +24,15 @@ public class UserCreateDTO {
     private String password;
 
     private List<String> roles;
+
+    public UserCreateDTO(String firstName, String lastName, Integer age, String email, String password, Set<Role> roles) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.email = email;
+        this.password = password;
+        this.roles = roles.stream().map(Role::getName).collect(Collectors.toList());
+    }
 
     public String getFirstName() {
         return firstName;

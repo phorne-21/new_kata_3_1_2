@@ -1,5 +1,7 @@
 package ru.kata.spring.boot_security.demo.DTO;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
@@ -14,7 +16,13 @@ public class UserReadDTO {
     private final String email;
     private final List<String> roles;
 
-    public UserReadDTO(Long id, String firstName, String lastName, Integer age, String email, List<String> roles) {
+    @JsonCreator
+    public UserReadDTO(@JsonProperty("id") Long id,
+                       @JsonProperty("firstName") String firstName,
+                       @JsonProperty("lastName") String lastName,
+                       @JsonProperty("age") Integer age,
+                       @JsonProperty("email") String email,
+                       @JsonProperty("roles") List<String> roles) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
