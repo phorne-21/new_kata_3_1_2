@@ -1,14 +1,22 @@
 package ru.kata.spring.boot_security.demo.controller.rest;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/api/auth")
 public class LoginRestController {
-    @GetMapping
-    public String showLoginPage() {
-        return "login";
+
+    @GetMapping("/login")
+    public ResponseEntity<?> showLoginPage() {
+        return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }
