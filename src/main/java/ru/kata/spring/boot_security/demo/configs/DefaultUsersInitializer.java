@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import ru.kata.spring.boot_security.demo.DTO.UserCreateDTO;
 import ru.kata.spring.boot_security.demo.model.Role;
-import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.DTO.UserDTOService;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 
@@ -31,20 +30,29 @@ public class DefaultUsersInitializer {
                 roleService.saveRole(roleAdmin);
                 roleService.saveRole(roleUser);
 
-                User admin = new User("admin", "admin", 20, "admin@admin.com");
-                admin.setPassword("admin");
                 Set<Role> adminRoles = new HashSet<>();
                 adminRoles.add(roleAdmin);
-                admin.setRoles(adminRoles);
 
-                User user = new User("test_user", "test_user", 30, "test@test.com");
-                user.setPassword("user");
+                UserCreateDTO admin = new UserCreateDTO("admin",
+                        "admin",
+                        20,
+                        "admin@admin.com",
+                        "admin",
+                        adminRoles);
+
                 Set<Role> userRoles = new HashSet<>();
                 userRoles.add(roleUser);
-                user.setRoles(userRoles);
+
+                UserCreateDTO user = new UserCreateDTO(
+                        "test_user",
+                        "test_user",
+                        30,
+                        "test@test.com",
+                        "user",
+                        userRoles);
 
                 userService.create(admin);
-                userService.create(UserCreateDTO(user));
+                userService.create(user);
             }
         } catch (Exception e) {
             e.printStackTrace();

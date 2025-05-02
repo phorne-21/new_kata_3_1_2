@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.configs;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -19,12 +20,13 @@ public class SuccessUserHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException {
 
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-        if (roles.contains("ROLE_ADMIN")) {
-            httpServletResponse.sendRedirect("/admin");
-        } else if (roles.contains("ROLE_USER")) {
-            httpServletResponse.sendRedirect("/user");
-        } else {
-            httpServletResponse.sendRedirect("/");
-        }
+
+        httpServletResponse.setStatus(HttpStatus.OK.value());
+        httpServletResponse.setContentType("application/json");
+
+        String role = roles.contains("ROLE_ADMIN") ? "ADMIN" : "USER";
+        String body = String.format("{status: \"success\", role: \"%s\"}", role);
+
+        httpServletResponse.getWriter().write(body);
     }
 }
