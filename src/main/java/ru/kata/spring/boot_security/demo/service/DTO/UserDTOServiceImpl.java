@@ -2,12 +2,14 @@ package ru.kata.spring.boot_security.demo.service.DTO;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.kata.spring.boot_security.demo.DTO.UserCreateDTO;
 import ru.kata.spring.boot_security.demo.DTO.UserReadDTO;
 import ru.kata.spring.boot_security.demo.DTO.UserUpdateDTO;
@@ -85,7 +87,8 @@ public class UserDTOServiceImpl implements UserDTOService, UserDetailsService {
         logger.info("loadUserByUsername was called in UserServiceImpl");
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            logger.warning("User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         return user;
     }
@@ -101,9 +104,14 @@ public class UserDTOServiceImpl implements UserDTOService, UserDetailsService {
     @Override
     public UserReadDTO findByEmail(String email) {
         logger.info("findByEmail was called in UserServiceImpl");
+        if (email == null || email.isEmpty()) {
+            logger.warning(this.getClass().getName() + ", findByEmail: Current user not found - Email is null or empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current user not found - Email is null or empty");
+        }
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new EntityNotFoundException("User not found");
+            logger.warning(this.getClass().getName() + ", findByEmail: User is null");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         return UserReadDTO.from(user);
     }
@@ -126,6 +134,7 @@ public class UserDTOServiceImpl implements UserDTOService, UserDetailsService {
         }
         if (userDTO.getEmail() != null && !userDTO.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(userDTO.getEmail())) {
+                logger.warning(this.getClass().getName() + ", update: Email already exists");
                 throw new IllegalArgumentException("Email already exists");
             }
             user.setEmail(userDTO.getEmail());
@@ -133,15 +142,15 @@ public class UserDTOServiceImpl implements UserDTOService, UserDetailsService {
         if (userDTO.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
-        if (userDTO.getRoles() != null || userDTO.getRoles().isEmpty()) {
-            user.setRoles(getRolesSetFromRoleNamesList(userDTO.getRoles()));
-        }
+        user.setRoles(getRolesSetFromRoleNamesList(userDTO.getRoles()));
         return UserReadDTO.from(userRepository.save(user));
     }
 
     private Set<Role> getRolesSetFromRoleNamesList(List<String> roleNameList) {
         Set<Role> roles;
         if (roleNameList == null || roleNameList.isEmpty()) {
+            logger.warning(this.getClass().getName() + ": roleNameList is null or empty");
+            logger.info(this.getClass().getName() + ": add a default roles");
             roles = new HashSet<>();
             roles.add(roleRepository.findByName(Role.defaultRoleName));
         } else {
