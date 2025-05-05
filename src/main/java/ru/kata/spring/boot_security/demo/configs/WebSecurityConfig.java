@@ -28,6 +28,7 @@ public class WebSecurityConfig {
                 // настройки авторизации, остальное с помощью @PreAuthorize
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/", "/login", "/static/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // включаем stateless режим, чтобы сервер не хранил сессию
