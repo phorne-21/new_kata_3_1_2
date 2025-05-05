@@ -17,6 +17,9 @@ public class LoginRestController {
         return ResponseEntity.ok().build();
     }
 
-
-
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        // Spring Security автоматически обработает выход
+        return ResponseEntity.ok().build();
+    }
 }

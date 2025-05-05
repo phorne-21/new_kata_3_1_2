@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.controller.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.DTO.UserCreateDTO;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/api/auth/admin")
 public class AdminRestController {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -26,6 +27,7 @@ public class AdminRestController {
 
     // 200 - done - TODO - todo&check
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<List<UserReadDTO>> getUsers(Authentication authentication) {
         logger.info("getUsers called in AdminRest Controller");
         logger.info("Request for current user by email: " + authentication.getName());
@@ -38,8 +40,10 @@ public class AdminRestController {
 //        logger.info("showUserUpdatePage called in AdminRestController");
 //        return ResponseEntity.ok(userService.findById(id));
 //    }
+
     // 200 or 404 - TODO - todo&check
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserReadDTO> getUserById(@PathVariable Long id) {
         logger.info("findUserById called in AdminRestController");
         return ResponseEntity.ok(userService.findById(id));
@@ -47,6 +51,7 @@ public class AdminRestController {
 
     // 201 - in proc - TODO - todo&check
     @PostMapping("/users")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserReadDTO> createUser(@RequestBody UserCreateDTO user) {
         logger.info("addUser called in AdminRestController");
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -55,6 +60,7 @@ public class AdminRestController {
 
     // 200 - TODO - todo&check
     @PutMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserReadDTO> updateUser(@PathVariable Long id,
                                                   @RequestBody UserUpdateDTO user) {
         userService.update(id, user);
@@ -63,10 +69,10 @@ public class AdminRestController {
 
     // 204 - done  - TODO - todo&check
     @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         logger.info("deleteUser called in AdminRestController");
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

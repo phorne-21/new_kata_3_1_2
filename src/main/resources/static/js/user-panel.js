@@ -8,6 +8,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+document.getElementById('logout-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+        await api.logout();
+        window.location.href = '/login.html'; // переход на страницу авторизации
+    } catch (error) {
+        console.error('Logout failed:', error);
+        alert('Logout failed. Please try again.');
+    }
+});
+
 async function loadUserData() {
     try {
         const user = await api.getCurrentUser();
