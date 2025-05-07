@@ -1,11 +1,17 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        const user = await api.getCurrentUser();
+        if (!user.roles.some(r => r.name === 'ROLE_ADMIN')) {
+            window.location.href = '/user.html';
+            return;
+        }
+
         await loadUsers();
         await loadRoles(); // Загружаем роли для селектов
         setupEventListeners();
-        loadCurrentUser(); // Загружаем данные текущего пользователя
+        renderCurrentUser(user); // Загружаем данные текущего пользователя
     } catch (error) {
-        showError('Initialization failed: ' + error.message);
+        showError('Access denied or initialization failed: ' + error.message);
     }
 });
 

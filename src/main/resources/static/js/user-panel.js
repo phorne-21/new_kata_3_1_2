@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await loadUserData();
+        const user = await api.getCurrentUser();
+        if (!user.roles.some(r => r.name === 'ROLE_ADMIN')) {
+            window.location.href = '/admin_panel.html';
+            return;
+        }
+
+        renderUserData(user);
         setupEventListeners();
     } catch (error) {
-        console.error('Initialization error:', error);
-        alert('Failed to load user data');
+        window.location.href = '/login.html';
     }
 });
 

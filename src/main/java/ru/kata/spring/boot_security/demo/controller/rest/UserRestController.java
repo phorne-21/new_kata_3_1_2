@@ -23,7 +23,7 @@ public class UserRestController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserReadDTO> getCurrentUser(Authentication authentication) {
         logger.info("Request for current user by email: " + authentication.getName());
         return ResponseEntity.ok(userService.findByEmail(authentication.getName()));

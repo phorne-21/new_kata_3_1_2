@@ -1,14 +1,11 @@
 const api = {
-    baseUrl: '/api',
+    baseUrl: '',
 
     async request(url, method, body = null) {
         const options = {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include'
+            method, headers: {
+                'Content-Type': 'application/json', 'Accept': 'application/json'
+            }, credentials: 'include'
         };
 
         if (body) {
@@ -26,7 +23,7 @@ const api = {
     },
 
     async login(credentials) {
-        return this.request('/auth/login', 'POST', credentials);
+        return this.request('/login', 'POST', credentials);
     },
 
     // async logout() {
@@ -34,9 +31,8 @@ const api = {
     // },
 
     async logout() {
-        const response = await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include' // важно для передачи сессии
+        const response = await fetch('/logout', {
+            method: 'POST', credentials: 'include' // важно для передачи сессии
         });
 
         if (!response.ok) {

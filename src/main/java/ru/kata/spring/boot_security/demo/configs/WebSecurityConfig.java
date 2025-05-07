@@ -26,41 +26,21 @@ public class WebSecurityConfig {
 
     // цепочка фильтров защиты
     @Bean
-//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        return http
-//                // отключаем csrf - подделку межсайтовых запросов
-//                .csrf(csrf -> csrf.disable())
-//                // настройки авторизации, остальное с помощью @PreAuthorize
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/login").permitAll()
-//                        .requestMatchers("/user", "/user/**").hasAnyRole("USER", "ADMIN")
-//                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/", "/login", "/static/**", "/css/**", "/js/**", "/templates/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                // включаем stateless режим, чтобы сервер не хранил сессию
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                // включаем HTTP Basic аутентификацию с настройками по умолчанию
-//                .httpBasic(Customizer.withDefaults())
-//                .build();
-//    }
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login").permitAll()
+                .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/user").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/", "/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
                         .successHandler(successUserHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/login")
                         .permitAll());
         return http.build();
     }

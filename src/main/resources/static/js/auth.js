@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                const response = await api.login(credentials);
-                window.location.href = response.role === 'ADMIN' ? '/admin_panel.html' : '/user.html';
+                await api.login(credentials);
+                // Просто перезагружаем страницу, Spring Security сам перенаправит
+                window.location.href = '/';
             } catch (error) {
                 showError('Login failed: ' + error.message);
             }
