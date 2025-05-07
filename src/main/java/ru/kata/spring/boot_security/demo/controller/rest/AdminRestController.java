@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/api/auth/admin")
+@RequestMapping(value = "/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminRestController {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -27,7 +28,6 @@ public class AdminRestController {
 
     // 200 - done - TODO - todo&check
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<List<UserReadDTO>> getUsers(Authentication authentication) {
         logger.info("getUsers called in AdminRest Controller");
         logger.info("Request for current user by email: " + authentication.getName());
