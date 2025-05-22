@@ -12,7 +12,8 @@ import ru.kata.spring.boot_security.demo.service.DTO.UserDTOService;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
+@PreAuthorize("isAuthenticated()")
 public class UserRestController {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -22,8 +23,7 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    @GetMapping
-//    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/current-user")
     public ResponseEntity<UserReadDTO> getCurrentUser(Authentication authentication) {
         logger.info("Request for current user by email: " + authentication.getName());
         return ResponseEntity.ok(userService.findByEmail(authentication.getName()));
