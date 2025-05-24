@@ -1,77 +1,145 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        console.log("Loading user data...");
         const user = await getCurrentUser();
+        console.log("User data received:", user);
+
         updateUserInfo(user);
-        renderUserTable(user); // Переименовано для ясности
+        renderUserTable(user);
     } catch (error) {
-        console.error('Error initializing page:', error);
-        // Перенаправляем только если ошибка 401 (Unauthorized)
-        if (error instanceof Error && error.message.includes('401')) {
-            window.location.href = '/login';
-        }
+        console.error('Error loading user data:', error);
+        // Можно добавить отображение ошибки пользователю
+        const errorElement = document.createElement('div');
+        errorElement.className = 'alert alert-danger';
+        errorElement.textContent = 'Failed to load user data. Please try again.';
+        document.querySelector('.main-content').prepend(errorElement);
     }
 });
 
 async function getCurrentUser() {
-    const response = await fetch('/api/user/current-user', {
-        credentials: 'include'
-    });
+    try {
+        console.log("Fetching user data from /api/user/current-user...");
+        const response = await fetch('/api/user/current-user', {
+            credentials: 'include'
+        });
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error response:", errorText);
+            throw new Error(`Server returned ${response.status}: ${errorText}`);
+        }
 
-    if (response.status === 401) {
-        throw new Error('Unauthorized (401)');
+        const userData = await response.json();
+        console.log("Parsed user data:", userData);
+        return userData;
+    } catch (error) {
+        console.error("Error in getCurrentUser:", error);
+        throw error;
     }
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
 }
 
 function updateUserInfo(user) {
-    document.getElementById('user-email').textContent = user.email;
-    document.getElementById('user-roles').textContent =
-        user.roles.map(role => role.name.replace('ROLE_', '')).join(', ');
+    try {
+        console.log("Updating user info with:", user);
+
+        const emailElement = document.getElementById('user-email');
+        const rolesElement = document.getElementById('user-roles');
+
+        if (!emailElement || !rolesElement) {
+            throw new Error('Required DOM elements not found');
+        }
+
+        // Устанавливаем email
+        emailElement.textContent = user?.email || 'No email';
+
+        // Обрабатываем роли (учитываем, что roles может быть массивом строк)
+        const roles = user?.roles || [];
+        const formattedRoles = roles
+            .map(role => {
+                // Если role - строка (из UserReadDTO), просто обрабатываем
+                if (typeof role === 'string') {
+                    return role.replace('ROLE_', '');
+                }
+                // Если role - объект (на всякий случай)
+                return role?.name?.replace('ROLE_', '') || 'N/A';
+            })
+            .filter(role => role !== 'N/A')
+            .join(', ');
+
+        rolesElement.textContent = formattedRoles || 'No roles assigned';
+    } catch (error) {
+        console.error("Error in updateUserInfo:", error);
+        throw error;
+    }
 }
 
 function renderUserTable(user) {
-    const tbody = document.getElementById('user-table-body');
-    tbody.innerHTML = '';
+    try {
+        console.log("Rendering user table with:", user);
 
-    const tr = document.createElement('tr');
-    tr.appendChild(createCell(user.id));
-    tr.appendChild(createCell(user.firstName || ''));
-    tr.appendChild(createCell(user.lastName || ''));
-    tr.appendChild(createCell(user.age || ''));
-    tr.appendChild(createCell(user.email));
-    tr.appendChild(createCell(
-        user.roles.map(role => role.name.replace('ROLE_', '')).join(', ')
-    ));
+        const tbody = document.getElementById('user-table-body');
+        if (!tbody) {
+            throw new Error('Table body element not found');
+        }
 
-    tbody.appendChild(tr);
-}
+        tbody.innerHTML = '';
 
-function createCell(content) {
-    const td = document.createElement('td');
-    td.textContent = content;
-    return td;
+        const tr = document.createElement('tr');
+
+        // Формируем данные для таблицы
+        const userData = [
+            user?.id ?? 'N/A',
+            user?.firstName ?? 'N/A',
+            user?.lastName ?? 'N/A',
+            user?.age ?? 'N/A',
+            user?.email ?? 'N/A',
+            // Форматируем роли аналогично updateUserInfo
+            (user?.roles || [])
+                .map(role => {
+                    if (typeof role === 'string') {
+                        return role.replace('ROLE_', '');
+                    }
+                    return role?.name?.replace('ROLE_', '') || 'N/A';
+                })
+                .filter(role => role !== 'N/A')
+                .join(', ') || 'No roles'
+        ];
+
+        // Добавляем ячейки в строку
+        userData.forEach(data => {
+            const td = document.createElement('td');
+            td.textContent = data;
+            tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+        console.log("Table rendered successfully");
+    } catch (error) {
+        console.error("Error in renderUserTable:", error);
+        throw error;
+    }
 }
 
 // Обработка выхода из системы
-document.getElementById('logout-form').addEventListener('submit', async (event) => {
+document.getElementById('logout-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
+        console.log("Attempting logout...");
         const response = await fetch('/logout', {
             method: 'POST',
             credentials: 'include'
         });
 
         if (response.ok) {
+            console.log("Logout successful, redirecting to login page");
             window.location.href = '/login';
         } else {
-            console.error('Logout failed with status:', response.status);
+            const errorText = await response.text();
+            console.error(`Logout failed with status ${response.status}:`, errorText);
+            alert('Logout failed. Please try again.');
         }
     } catch (error) {
-        console.error('Error logging out:', error);
+        console.error("Error during logout:", error);
+        alert('An error occurred during logout. Please try again.');
     }
 });
