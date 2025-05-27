@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 @RequestMapping("/login")
 public class LoginController {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+
     @GetMapping
     public String showLoginPage() {
         logger.info("showLoginPage");

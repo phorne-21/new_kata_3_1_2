@@ -93,6 +93,7 @@ function renderUserTable(user) {
             user?.lastName ?? 'N/A',
             user?.age ?? 'N/A',
             user?.email ?? 'N/A',
+
             // Форматируем роли аналогично updateUserInfo
             (user?.roles || [])
                 .map(role => {
